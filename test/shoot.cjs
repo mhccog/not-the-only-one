@@ -12,7 +12,7 @@ const [,, url = 'http://localhost:8790/', out = 'shot.png', w = '1440', h = '900
   await new Promise(r => setTimeout(r, +waitMs));
   if (action === 'click2') { await p.evaluate(() => document.querySelectorAll('.conv')[1]?.click()); await new Promise(r => setTimeout(r, 6000)); }
   await p.screenshot({ path: out });
-  const info = await p.evaluate(() => ({ caption: document.getElementById('captionMain').textContent, title: document.getElementById('panelTitle').textContent, convs: document.querySelectorAll('.conv').length, srcs: [...document.querySelectorAll('.src')].map(s => s.textContent + ':' + s.className), note: document.querySelector('.note')?.textContent }));
+  const info = await p.evaluate(() => ({ zoom: window.__notTheOnlyOne?.map?.getZoom(), center: window.__notTheOnlyOne?.map?.getCenter(), caption: document.getElementById('captionMain').textContent, title: document.getElementById('panelTitle').textContent, convs: document.querySelectorAll('.conv').length, srcs: [...document.querySelectorAll('.src')].map(s => s.textContent + ':' + s.className), note: document.querySelector('.note')?.textContent }));
   console.log(JSON.stringify(info, null, 1));
   console.log('ERRORS:', errs.length ? errs.join('\n') : 'none');
   await b.close();

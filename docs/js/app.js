@@ -27,6 +27,7 @@ const map = new maplibregl.Map({
   },
   center: [20, 22], zoom: isMobile() ? 0.35 : 1.15, attributionControl: false, maxPitch: 0, renderWorldCopies: false,
 });
+state.map = map;
 map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: 'Natural Earth · OpenAlex · GitHub · Hacker News · arXiv · Photon/OSM' }), 'bottom-right');
 map.dragRotate.disable(); map.touchZoomRotate.disableRotation();
 ['mousedown', 'touchstart', 'wheel'].forEach(ev => map.getCanvasContainer().addEventListener(ev, () => { state.lastInteract = performance.now(); }, { passive: true }));
@@ -87,15 +88,26 @@ function arc(a, b, steps = 96) {
     if (prevLon != null) { while (lon - prevLon > 180) lon -= 360; while (lon - prevLon < -180) lon += 360; }
     prevLon = lon; pts.push([lon, lat]);
   }
-  return pts;
+  // MapLibre cannot draw beyond ~85° latitude, so split arcs that pass near a pole into pieces around it
+  const segs = []; let cur = [];
+  for (const p of pts) {
+    if (Math.abs(p[1]) > 84.8) { if (cur.length > 1) segs.push(cur); cur = []; continue; }
+    if (!cur.length && segs.length) { let lon = p[0]; const ref = segs[segs.length - 1].at(-1)[0]; while (lon - ref > 180) lon -= 360; while (lon - ref < -180) lon += 360; p[0] = lon; }
+    cur.push(p);
+  }
+  if (cur.length > 1) segs.push(cur);
+  return segs.length ? segs : null;
 }
 function viewFor(points) {
   if (!points.length) return { center: [20, 20], zoom: 1 };
   const s = [0, 0, 0]; for (const p of points) { const v = toVec(p[0], p[1]); s[0] += v[0]; s[1] += v[1]; s[2] += v[2]; }
   const c = Math.hypot(...s) < 1e-6 ? points[0] : toLonLat(s);
   let spread = 0; for (const p of points) spread = Math.max(spread, deg(angle(c, p)));
-  const z = spread > 70 ? 1.1 : spread > 45 ? 1.5 : spread > 25 ? 1.95 : spread > 12 ? 2.5 : spread > 5 ? 3.1 : 3.6;
-  return { center: c, zoom: isMobile() ? Math.max(0.1, z - 1.1) : z };
+  const z = spread > 100 ? 0.55 : spread > 70 ? 0.85 : spread > 45 ? 1.4 : spread > 25 ? 1.95 : spread > 12 ? 2.5 : spread > 5 ? 3.1 : 3.6;
+  // MapLibre's globe keeps Mercator zoom semantics, so the globe looks larger at high latitudes; compensate.
+  const latFix = Math.log2(Math.cos(rad(Math.min(Math.abs(c[1]), 80))));
+  const zz = z + latFix;
+  return { center: c, zoom: Math.max(isMobile() ? -1.2 : -0.6, isMobile() ? zz - 1.1 : zz) };
 }
 
 // ---------- animation ----------
@@ -154,7 +166,7 @@ function setThreads(ci) {
     const pairs = [];
     if (pts.length <= 4) { for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) pairs.push([pts[i], pts[j]]); }
     else for (let i = 0; i + 1 < pts.length; i++) pairs.push([pts[i], pts[i + 1]]);
-    for (const [a, b] of pairs) { const g = arc(a, b); if (g) { state.arcs.push(g); feats.push({ type: 'Feature', properties: { w: 1 }, geometry: { type: 'LineString', coordinates: g } }); } }
+    for (const [a, b] of pairs) { const g = arc(a, b); if (g) { state.arcs.push(g.flat()); feats.push({ type: 'Feature', properties: { w: 1 }, geometry: { type: 'MultiLineString', coordinates: g } }); } }
     const named = new Set();
     for (const m of c.members) {
       if (!m.place) continue;
