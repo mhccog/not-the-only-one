@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }
       - name: Sweep public sources
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # built-in, short-lived; used only for GitHub's public search API

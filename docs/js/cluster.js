@@ -111,6 +111,8 @@ export function distinctPlaces(places) {
 function maxKm(ps) { let m = 0; for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) m = Math.max(m, km(ps[i], ps[j])); return m; }
 export function daysBetween(a, b) { return Math.abs(new Date(a) - new Date(b)) / DAY; }
 
+const wordSet = (t) => new Set((t || '').toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 2));
+function jaccard(a, b) { const A = wordSet(a), B = wordSet(b); if (A.size < 4 || B.size < 4) return 0; let i = 0; for (const w of A) if (B.has(w)) i++; return i / (A.size + B.size - i); }
 const prefix = (t) => (t || '').toLowerCase().split(/\s+/).slice(0, 6).join(' ');
 function sharesTeam(a, b) {
   if (!a.team || !b.team) return false;
@@ -164,9 +166,11 @@ export function findConvergences(efforts, opts = {}) {
     // keep one effort per team (earliest), so every member is independent of the others
     let members = clusters[ci].map(i => ({ i, e: efforts[i] })).sort((x, y) => (x.e.date || '').localeCompare(y.e.date || ''));
     const kept = [];
-    // "Same work" heuristics: same institution; a paper and a repo that describe each other (its own code);
+    // "Same work" heuristics: near-identical text; same institution; a paper and a repo that describe each other (its own code);
     // or near-identical items in the same venue within a week (one coordinated series, not independent teams).
     const sameWork = (a, b) => sharesTeam(a.e, b.e)
+      || jaccard(a.e.description || a.e.title, b.e.description || b.e.title) > 0.6
+      || S[a.i][b.i] > 0.75 // near-identical text: a copy, a template or a duplicate record, not two independent efforts
       || (a.e.title || '').toLowerCase() === (b.e.title || '').toLowerCase()
       || (a.e.instId && a.e.instId === b.e.instId)
       || ((a.e.kind === 'repo') !== (b.e.kind === 'repo') && S[a.i][b.i] > 0.45)

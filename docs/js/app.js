@@ -210,7 +210,7 @@ function renderPanel() {
       <h3>${esc(c.caption)}</h3>
       ${c.terms?.length ? `<p class="terms">Shared ground: ${esc(c.terms.join(' · '))}</p>` : ''}
       ${c.members.map(memberHTML).join('')}
-      <p class="consent">No shared authors or owners between these. Introductions: coming later, only with everyone's consent.</p>
+      <p class="consent">No shared authors or owners between these. Introductions: coming later, only with everyone's consent.${cur.query ? ` <a href="?seen=${encodeURIComponent(cur.query)}&i=${i}">Link to this</a>` : ''}</p>
     </div>`;
   });
   if (cur.loose?.length) {
@@ -249,7 +249,7 @@ function showDiscoveryTopic(t, i) {
   const st = state.discoveries;
   state.current = {
     kicker: state.quiet ? 'Quiet discovery' : 'From the weekly sweep',
-    title: t.topic, captionTopic: t.topic,
+    title: t.topic, captionTopic: t.topic, query: t.query,
     convergences: t.convergences,
     status: statusFromSaved(t.status, st.generatedAt),
     message: `Found in a sweep of public sources on ${esc(new Date(st.generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }))}. <a href="?q=${encodeURIComponent(t.query)}" data-live="${esc(t.query)}">Search this live</a>.`,
@@ -381,8 +381,11 @@ async function boot() {
   $('chips').innerHTML = topics.map(t => `<button type="button" data-q="${esc(t.q)}">${esc(t.label)}</button>`).join('');
   $('chips').querySelectorAll('button').forEach(b => b.addEventListener('click', () => runSearch(b.dataset.q)));
   buildQuietQueue();
-  const q = new URLSearchParams(location.search).get('q');
+  const params = new URLSearchParams(location.search);
+  const q = params.get('q'), seen = params.get('seen');
+  const seenTopic = seen && disc?.topics.find(t => t.query === seen);
   if (q) runSearch(q);
+  else if (seenTopic) { state.quiet = false; $('quietBtn').setAttribute('aria-pressed', 'false'); $('quietLabel').textContent = 'Play quiet discovery'; showDiscoveryTopic(seenTopic, Math.min(+params.get('i') || 0, seenTopic.convergences.length - 1)); }
   else if (state.quietQueue.length) startQuiet();
   else {
     state.current = { kicker: 'Quiet discovery', title: 'Resting', convergences: [], status: [], message: 'The weekly sweep of public sources is not available right now, so there is nothing to play. You can still search live below.' };

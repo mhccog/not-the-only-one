@@ -4,3 +4,4 @@ node_modules/
 *.log
 test/*.png
 .raw/
+screenshot*.png
