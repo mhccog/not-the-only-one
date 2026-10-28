@@ -1,0 +1,18 @@
+[
+  {"label": "Detecting microplastics in water", "q": "microplastic detection water"},
+  {"label": "Early warning for floods", "q": "flood early warning", "gh": "flood forecasting"},
+  {"label": "Spotting crop disease from a phone photo", "q": "plant disease detection smartphone", "gh": "plant disease detection"},
+  {"label": "Translating sign language", "q": "sign language translation"},
+  {"label": "Recycling lithium-ion batteries", "q": "lithium battery recycling"},
+  {"label": "Language models for low-resource languages", "q": "low-resource language model", "gh": "low resource language llm"},
+  {"label": "Catching sepsis early", "q": "sepsis early prediction", "gh": "sepsis prediction"},
+  {"label": "Cheap air-quality sensors", "q": "low-cost air quality sensor", "gh": "air quality sensor"},
+  {"label": "Seeing wildfires from orbit", "q": "wildfire detection satellite"},
+  {"label": "Hearing mosquitoes", "q": "mosquito acoustic detection", "gh": "mosquito detection"},
+  {"label": "Keeping cities cool in heatwaves", "q": "urban heat island mitigation", "gh": "urban heat island"},
+  {"label": "Antibiotic resistance in wastewater", "q": "antimicrobial resistance wastewater surveillance", "gh": "antimicrobial resistance"},
+  {"label": "Screening for dyslexia", "q": "dyslexia screening", "gh": "dyslexia"},
+  {"label": "Fresh water from sunlight", "q": "solar desalination", "gh": "solar desalination"},
+  {"label": "Finding landmines", "q": "landmine detection", "gh": "landmine detection"},
+  {"label": "Snakebite", "q": "snakebite envenoming", "gh": "snake identification"}
+]

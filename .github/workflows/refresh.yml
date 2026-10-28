@@ -1,0 +1,26 @@
+name: Weekly sweep for quiet discovery
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # Mondays 04:17 UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: { group: sweep, cancel-in-progress: false }
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Sweep public sources
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # built-in, short-lived; used only for GitHub's public search API
+        run: node scripts/build.mjs
+      - name: Commit refreshed data
+        run: |
+          git config user.name "not-the-only-one sweep"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data/discoveries.json docs/data/places-cache.json
+          git diff --cached --quiet || (git commit -m "Weekly sweep $(date -u +%F)" && git push)

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>You're not the only one</title>
+<meta name="description" content="Somewhere, someone is working on the same problem as you, right now. A calm globe of real, independent efforts converging on the same idea.">
+<meta name="theme-color" content="#04060b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='10' cy='16' r='4' fill='%23ffd9a0'/%3E%3Ccircle cx='22' cy='16' r='4' fill='%23ffd9a0'/%3E%3Cpath d='M10 16 Q16 6 22 16' stroke='%23ffd9a0' fill='none' stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="map" aria-label="Globe of efforts"></div>
+<div class="vignette"></div>
+
+<header class="brand">
+  <h1>You're not the only one</h1>
+  <p>Somewhere, someone is working on the same problem as you, right now.</p>
+</header>
+
+<section class="caption" id="caption" aria-live="polite">
+  <p class="caption-topic" id="captionTopic"></p>
+  <p class="caption-main" id="captionMain">Listening for people working on the same thing…</p>
+  <p class="caption-terms" id="captionTerms"></p>
+</section>
+
+<section class="ask">
+  <form id="askForm" autocomplete="off">
+    <input id="askInput" type="search" maxlength="120" placeholder="What are you working on?" aria-label="A problem or topic">
+    <button type="submit">Find the others</button>
+  </form>
+  <div class="chips" id="chips"></div>
+</section>
+
+<aside class="panel" id="panel" aria-label="Convergences">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker" id="panelKicker">Quiet discovery</p>
+      <h2 id="panelTitle"></h2>
+    </div>
+    <button class="icon" id="panelToggle" aria-label="Collapse panel">–</button>
+  </div>
+  <div class="sources" id="sources"></div>
+  <div class="panel-body" id="panelBody"></div>
+</aside>
+
+<nav class="dock">
+  <button id="quietBtn" class="ghost" aria-pressed="true"><span class="dot"></span><span id="quietLabel">Quiet discovery is playing</span></button>
+  <button id="aboutBtn" class="ghost">How this works</button>
+</nav>
+
+<dialog id="about">
+  <h3>How this works</h3>
+  <p>Type a problem and this page asks open, public sources who has worked on it in the last twelve months: research papers on <a href="https://openalex.org" target="_blank" rel="noopener">OpenAlex</a> (which includes arXiv preprints), new repositories on <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>, and discussions on <a href="https://news.ycombinator.com" target="_blank" rel="noopener">Hacker News</a>. Quiet discovery also uses <a href="https://arxiv.org" target="_blank" rel="noopener">arXiv</a> directly, refreshed weekly.</p>
+  <p>It then groups efforts that describe nearly the same thing, using plain word overlap in your browser (no AI service), and keeps only groups made by <em>independent</em> people: no shared authors, no shared owner, close together in time.</p>
+  <p>Every dot is a real record and links to it. Places come from the authors' listed institutions, or from the public location on a GitHub profile; when only a country is known the dot sits at the country's centre and says so. Dates are when work was published, created or posted, not when it began. Nothing is invented, and if a source is unavailable the page says so.</p>
+  <p class="soon"><strong>Introductions are coming later, with consent.</strong> Today this only shows public work. It contacts no one, needs no login and stores nothing about you.</p>
+  <form method="dialog"><button>Close</button></form>
+</dialog>
+
+<div id="tip" class="tip" hidden></div>
+
+<script src="vendor/maplibre-gl.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
